@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/rewrite.js": {
+      "maxDuration": 300,
+      "includeFiles": "prompts/**"
+    }
+  }
+}

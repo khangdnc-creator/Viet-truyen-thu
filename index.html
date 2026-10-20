@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xưởng Truyện</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --panel: #fffdf8;
+    --ink: #22201c;
+    --muted: #6f685c;
+    --line: #e2dccd;
+    --accent: #8a3b24;
+    --accent-ink: #fffaf3;
+    --field: #fffefb;
+    --danger: #a3261b;
+    --danger-bg: #fbe9e6;
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1916;
+      --panel: #23211d;
+      --ink: #ece6da;
+      --muted: #a39b8c;
+      --line: #3a362f;
+      --accent: #d98a6a;
+      --accent-ink: #1a1916;
+      --field: #1e1c19;
+      --danger: #f0a196;
+      --danger-bg: #3a201c;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.55 "Be Vietnam Pro", system-ui, sans-serif;
+  }
+  header {
+    display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; min-width: 0; }
+  .brand h1 { margin: 0; font: 600 22px/1.2 "Noto Serif", serif; letter-spacing: .2px; }
+  .brand span { color: var(--muted); font-size: 13px; }
+  .pw { display: flex; align-items: center; gap: 8px; }
+  .pw label { font-size: 13px; color: var(--muted); }
+  .pw input { width: 180px; }
+  main {
+    display: grid; grid-template-columns: minmax(340px, 440px) 1fr; gap: 24px;
+    padding: 24px; max-width: 1400px; margin: 0 auto;
+  }
+  @media (max-width: 900px) {
+    main { grid-template-columns: minmax(0, 1fr); padding: 16px; gap: 16px; }
+    header { padding: 14px 16px; }
+    .pw input { width: 140px; }
+  }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+  form.panel { min-width: 0; padding: 18px; display: flex; flex-direction: column; gap: 14px; align-self: start; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field > label { font-weight: 500; font-size: 13.5px; }
+  .hint { color: var(--muted); font-size: 12.5px; }
+  input, textarea, select {
+    width: 100%; font: inherit; color: var(--ink); background: var(--field);
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+  }
+  textarea { resize: vertical; }
+  #draft { min-height: 260px; font-family: "Noto Serif", serif; font-size: 15px; line-height: 1.6; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .modes { position: relative; }
+  .modes input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .modes label {
+    text-align: center; padding: 8px 6px; border: 1px solid var(--line); border-radius: 8px;
+    cursor: pointer; font-size: 13.5px; background: var(--field);
+  }
+  .modes input:checked + label { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .modes input:focus-visible + label { outline: 2px solid var(--accent); }
+  details { border-top: 1px solid var(--line); padding-top: 12px; }
+  summary { cursor: pointer; font-weight: 500; font-size: 13.5px; }
+  .brief { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .brief .wide { grid-column: 1 / -1; }
+  @media (max-width: 480px) { .brief { grid-template-columns: 1fr; } }
+  .count { text-align: right; }
+  .actions { display: flex; gap: 8px; }
+  button {
+    font: 600 14px/1 "Be Vietnam Pro", sans-serif; border-radius: 8px; padding: 11px 16px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--field); color: var(--ink);
+  }
+  button.primary { flex: 1; background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .out { display: flex; flex-direction: column; min-width: 0; min-height: 70vh; position: sticky; top: 16px; max-height: calc(100vh - 32px); align-self: start; }
+  .out article { overflow-y: auto; flex: 1; }
+  .out-bar {
+    display: flex; gap: 8px; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted);
+  }
+  .out-bar .tools { display: flex; gap: 6px; }
+  .out-bar button { padding: 7px 11px; font-size: 12.5px; font-weight: 500; }
+  #status { display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .busy .dot { background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) { .busy .dot { animation: none; } }
+  #error {
+    display: none; margin: 14px 14px 0; padding: 10px 12px; border-radius: 8px;
+    background: var(--danger-bg); color: var(--danger); font-size: 13.5px;
+  }
+  article {
+    padding: 28px clamp(18px, 5vw, 56px) 48px; max-width: 760px; width: 100%; margin: 0 auto;
+    font: 17px/1.8 "Noto Serif", Georgia, serif; overflow-wrap: anywhere;
+  }
+  article h1 { font-size: 26px; line-height: 1.3; margin: 0 0 22px; text-align: center; font-weight: 600; }
+  article h2 { font-size: 18px; margin: 30px 0 10px; font-family: "Be Vietnam Pro", sans-serif; }
+  article p { margin: 0 0 1em; text-align: justify; hyphens: auto; }
+  article hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+  article ul { font: 14px/1.6 "Be Vietnam Pro", sans-serif; color: var(--muted); padding-left: 20px; }
+  .empty { color: var(--muted); text-align: center; padding: 80px 20px; font-family: "Be Vietnam Pro", sans-serif; font-size: 14px; }
+  .empty strong { display: block; color: var(--ink); font-size: 16px; margin-bottom: 6px; font-weight: 600; }
+  @media (max-width: 900px) {
+    .out { position: static; max-height: none; }
+    .out article { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Xưởng Truyện</h1>
+    <span>Biến bản nháp thành chương truyện</span>
+  </div>
+  <div class="pw">
+    <label for="password">Mật khẩu</label>
+    <input id="password" type="password" autocomplete="current-password">
+  </div>
+</header>
+
+<main>
+  <form class="panel" id="form">
+    <div class="field">
+      <label>Kiểu việc</label>
+      <div class="modes" role="radiogroup">
+        <input type="radio" name="mode" id="m-expand" value="expand" checked><label for="m-expand">Viết từ dàn ý</label>
+        <input type="radio" name="mode" id="m-rewrite" value="rewrite"><label for="m-rewrite">Viết lại</label>
+        <input type="radio" name="mode" id="m-continue" value="continue"><label for="m-continue">Viết tiếp</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="draft">Bản nháp</label>
+      <textarea id="draft" name="draft" placeholder="Dán dàn ý, ghi chú, lời thoại thô hoặc đoạn văn cần viết lại…"></textarea>
+      <div class="hint count" id="count">0 ký tự</div>
+    </div>
+
+    <details>
+      <summary>Thông tin bổ sung (không bắt buộc)</summary>
+      <div class="brief">
+        <div class="field"><label for="title">Tên truyện</label><input id="title" name="title"></div>
+        <div class="field"><label for="chapter">Chương</label><input id="chapter" name="chapter" placeholder="VD: Chương 3"></div>
+        <div class="field"><label for="genre">Thể loại</label><input id="genre" name="genre" placeholder="VD: kiếm hiệp, giả tưởng"></div>
+        <div class="field"><label for="pov">Ngôi kể, thì</label><input id="pov" name="pov" placeholder="VD: ngôi thứ ba, quá khứ"></div>
+        <div class="field wide"><label for="setting">Bối cảnh và thể chế</label><input id="setting" name="setting" placeholder="VD: thế giới tu tiên tự tạo; tông môn, hoàng triều…"></div>
+        <div class="field wide"><label for="length">Độ dài mong muốn</label><input id="length" name="length" placeholder="VD: khoảng 3.000 chữ"></div>
+        <div class="field wide"><label for="mustKeep">Bắt buộc giữ (sự kiện, kết cục)</label><textarea id="mustKeep" name="mustKeep" rows="2"></textarea></div>
+        <div class="field wide"><label for="verbatim">Câu thoại giữ nguyên văn</label><textarea id="verbatim" name="verbatim" rows="2" placeholder="Mỗi câu một dòng"></textarea></div>
+        <div class="field wide"><label for="noDecide">AI không được tự quyết</label><textarea id="noDecide" name="noDecide" rows="2" placeholder="VD: ai là kẻ phản bội, ai chết"></textarea></div>
+        <div class="field wide"><label for="canon">Thiết lập đã có (nhân vật, sự kiện trước)</label><textarea id="canon" name="canon" rows="3"></textarea></div>
+        <div class="field wide"><label for="notes">Yêu cầu khác</label><textarea id="notes" name="notes" rows="2"></textarea></div>
+      </div>
+    </details>
+
+    <div class="actions">
+      <button type="submit" class="primary" id="go">Viết chương</button>
+      <button type="button" id="stop" disabled>Dừng</button>
+    </div>
+    <div class="hint">Bản nháp được lưu tạm trên trình duyệt này. Không dán nội dung bảo mật: gói miễn phí của Gemini có thể dùng dữ liệu gửi lên để cải thiện sản phẩm.</div>
+  </form>
+
+  <section class="panel out" aria-live="polite">
+    <div class="out-bar">
+      <div id="status"><span class="dot"></span><span id="status-text">Sẵn sàng</span></div>
+      <div class="tools">
+        <button type="button" id="copy" disabled>Sao chép</button>
+        <button type="button" id="download" disabled>Tải .md</button>
+      </div>
+    </div>
+    <div id="error" role="alert"></div>
+    <article id="output">
+      <div class="empty"><strong>Chương truyện sẽ hiện ở đây</strong>Nhập bản nháp rồi bấm “Viết chương”. Chữ sẽ hiện dần trong lúc AI viết.</div>
+    </article>
+  </section>
+</main>
+
+<script>
+(() => {
+  const ERR_MARK = '\u0007ERR\u0007';
+  const STORE_KEY = 'xuong-truyen-v1';
+  const $ = (id) => document.getElementById(id);
+  const form = $('form'), out = $('output'), errBox = $('error');
+  const fields = ['draft','title','chapter','genre','pov','setting','length','mustKeep','verbatim','noDecide','canon','notes'];
+  let text = '', controller = null, renderQueued = false;
+
+  // ---- Lưu tạm trên trình duyệt ----
+  function save() {
+    try {
+      const data = { mode: form.mode.value, password: $('password').value };
+      fields.forEach((f) => data[f] = $(f).value);
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    } catch {}
+  }
+  function load() {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+      fields.forEach((f) => { if (typeof data[f] === 'string') $(f).value = data[f]; });
+      if (typeof data.password === 'string') $('password').value = data.password;
+      if (data.mode && $('m-' + data.mode)) $('m-' + data.mode).checked = true;
+    } catch {}
+  }
+  load();
+  updateCount();
+  form.addEventListener('input', () => { updateCount(); save(); });
+  $('password').addEventListener('input', save);
+
+  function updateCount() {
+    const n = $('draft').value.length;
+    $('count').textContent = n.toLocaleString('vi-VN') + ' / 60.000 ký tự';
+  }
+
+  // ---- Hiển thị ----
+  // Bộ chuyển Markdown tối giản: tiêu đề, đoạn văn, gạch ngang, danh sách, đậm/nghiêng.
+  // Mọi ký tự HTML đều được thoát trước nên nội dung AI không thể chèn mã vào trang.
+  function esc(t) { return t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function inline(t) {
+    return esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<em>$2</em>');
+  }
+  function toHtml(md) {
+    const blocks = md.replace(/\r\n/g, '\n').split(/\n{2,}/);
+    return blocks.map((b) => {
+      const t = b.trim();
+      if (!t) return '';
+      let m;
+      if ((m = t.match(/^(#{1,4})\s+(.*)$/)) && !t.includes('\n')) return `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`;
+      if (/^(-{3,}|\*{3,})$/.test(t)) return '<hr>';
+      const lines = t.split('\n');
+      if (lines.every((l) => /^\s*[-*]\s+/.test(l))) return '<ul>' + lines.map((l) => '<li>' + inline(l.replace(/^\s*[-*]\s+/, '')) + '</li>').join('') + '</ul>';
+      return '<p>' + lines.map(inline).join('<br>') + '</p>';
+    }).join('');
+  }
+  function render() {
+    renderQueued = false;
+    out.innerHTML = toHtml(text);
+  }
+  function queueRender() { if (!renderQueued) { renderQueued = true; requestAnimationFrame(render); } }
+  function setBusy(busy, label) {
+    $('status').classList.toggle('busy', busy);
+    $('status-text').textContent = label;
+    $('go').disabled = busy;
+    $('stop').disabled = !busy;
+    $('copy').disabled = busy || !text;
+    $('download').disabled = busy || !text;
+  }
+  function showError(msg) { errBox.textContent = msg; errBox.style.display = msg ? 'block' : 'none'; }
+
+  // ---- Gửi yêu cầu ----
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    showError('');
+    const password = $('password').value;
+    if (!password) { showError('Nhập mật khẩu truy cập ở góc trên.'); $('password').focus(); return; }
+    if (!$('draft').value.trim()) { showError('Bạn chưa nhập bản nháp.'); $('draft').focus(); return; }
+
+    const payload = { mode: form.mode.value, password };
+    fields.forEach((f) => payload[f] = $(f).value);
+
+    text = '';
+    out.innerHTML = '';
+    controller = new AbortController();
+    setBusy(true, 'Đang đọc bản nháp…');
+    if (matchMedia('(max-width: 900px)').matches) document.querySelector('.out').scrollIntoView({ behavior: 'smooth' });
+
+    try {
+      const res = await fetch('/api/rewrite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      if (!res.ok) {
+        let msg = 'Có lỗi xảy ra (' + res.status + ').';
+        try { msg = (await res.json()).error || msg; } catch {}
+        if (res.status === 504) msg = 'Quá thời gian xử lý (5 phút). Hãy chia bản nháp thành phần ngắn hơn.';
+        throw new Error(msg);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      setBusy(true, 'Đang viết…');
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        text += decoder.decode(value, { stream: true });
+        const i = text.indexOf(ERR_MARK);
+        if (i !== -1) {
+          showError(text.slice(i + ERR_MARK.length));
+          text = text.slice(0, i);
+          queueRender();
+          break;
+        }
+        queueRender();
+      }
+      render();
+      if (!text.trim() && errBox.style.display !== 'block') showError('Không nhận được nội dung nào. Thử lại.');
+      setBusy(false, text ? 'Xong · ' + text.length.toLocaleString('vi-VN') + ' ký tự' : 'Sẵn sàng');
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        render();
+        setBusy(false, 'Đã dừng');
+      } else {
+        showError(err.message || 'Không kết nối được máy chủ.');
+        if (!text) out.innerHTML = '';
+        setBusy(false, 'Lỗi');
+      }
+    } finally {
+      controller = null;
+    }
+  });
+
+  $('stop').addEventListener('click', () => controller && controller.abort());
+
+  $('copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(text); $('status-text').textContent = 'Đã sao chép'; }
+    catch { showError('Trình duyệt không cho sao chép tự động. Hãy bôi đen và sao chép thủ công.'); }
+  });
+
+  $('download').addEventListener('click', () => {
+    const name = (($('chapter').value || $('title').value || 'chuong-truyen').trim()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
+      .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'chuong-truyen') + '.md';
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/markdown;charset=utf-8' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: name });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+})();
+</script>
+</body>
+</html>

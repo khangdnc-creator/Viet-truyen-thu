@@ -1,0 +1,7 @@
+{
+  "name": "viet-truyen-tu-ban-nhap",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Web app viết truyện từ bản nháp, dùng Gemini và chạy trên Vercel"
+}
